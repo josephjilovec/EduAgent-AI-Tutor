@@ -1,0 +1,138 @@
+// public/script.js
+
+// Get references to DOM elements
+const chatMessages = document.getElementById('chat-messages');
+const userInput = document.getElementById('user-input');
+const sendButton = document.getElementById('send-button');
+const loadingIndicator = document.getElementById('loading-indicator');
+
+/**
+ * Adds a message bubble to the chat interface.
+ * @param {string} sender - The name of the sender (e.g., "You", "Explainer Agent").
+ * @param {string} message - The content of the message.
+ * @param {boolean} isUser - True if the message is from the user, false otherwise.
+ */
+function addMessage(sender, message, isUser = false) {
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message-bubble');
+
+    if (isUser) {
+        messageDiv.classList.add('user-message');
+        messageDiv.textContent = message;
+    } else {
+        messageDiv.classList.add('agent-message');
+        const agentNameSpan = document.createElement('span');
+        agentNameSpan.classList.add('agent-name');
+        agentNameSpan.textContent = sender;
+        messageDiv.appendChild(agentNameSpan);
+        // Using innerHTML to allow for potential HTML formatting from AI responses (e.g., bolding)
+        messageDiv.innerHTML += message;
+    }
+    chatMessages.appendChild(messageDiv);
+    // Scroll to the bottom of the chat messages to show the latest message
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+/**
+ * Simulates an API call to the backend which would then call the Gemini API.
+ * In a real application, this function would make a `fetch` request to your Node.js backend.
+ * @param {string} userQuery - The user's input query.
+ * @returns {Promise<{explainerResponse: string, exampleResponse: string}>} - Simulated AI responses.
+ */
+async function simulateGeminiAPIResponse(userQuery) {
+    // --- IMPORTANT: This is a placeholder for your actual backend API call ---
+    // In your Node.js backend, you would make a fetch call to your Express.js API endpoint:
+    // const response = await fetch('/api/chat', {
+    //     method: 'POST',
+    //     headers: { 'Content-Type': 'application/json' },
+    //     body: JSON.stringify({ query: userQuery })
+    // });
+    // const data = await response.json();
+    // return data; // Expected structure: { explainerResponse: "...", exampleResponse: "..." }
+    // ----------------------------------------------------------------------
+
+    return new Promise(resolve => {
+        setTimeout(() => {
+            let explainerResponse = `That's a fascinating topic! Let me break down the core concept of "${userQuery}" for you.`;
+            let exampleResponse = `To make that clearer, here's a practical example related to "${userQuery}".`;
+
+            // Simple keyword-based simulated responses for demonstration
+            const lowerCaseQuery = userQuery.toLowerCase();
+            if (lowerCaseQuery.includes('gravity')) {
+                explainerResponse = "Gravity is a fundamental force of nature that attracts any objects with mass or energy towards each other. It's what keeps us on Earth and planets orbiting the sun.";
+                exampleResponse = "Think of an apple falling from a tree. It falls because of Earth's gravity pulling it down. Similarly, if you jump, gravity pulls you back to the ground.";
+            } else if (lowerCaseQuery.includes('photosynthesis')) {
+                explainerResponse = "Photosynthesis is the process by which green plants and some other organisms use sunlight to synthesize foods with chlorophyll. It converts light energy into chemical energy.";
+                exampleResponse = "Imagine a plant like a tiny chef! It takes sunlight, water from its roots, and carbon dioxide from the air, and 'cooks' them into sugar (food) and oxygen, which it releases for us to breathe.";
+            } else if (lowerCaseQuery.includes('democracy')) {
+                explainerResponse = "Democracy is a system of government where the citizens exercise power directly or elect representatives from among themselves to form a governing body, such as a parliament. It's based on the principle of 'rule by the people'.";
+                exampleResponse = "In a school, if students vote for their class representative, that's a small-scale example of democracy. Everyone gets a say in who represents them, similar to how citizens vote for leaders in a country.";
+            } else if (lowerCaseQuery.includes('ai')) {
+                explainerResponse = "Artificial Intelligence (AI) refers to the simulation of human intelligence in machines that are programmed to think like humans and mimic their actions. It can involve learning, reasoning, problem-solving, perception, and language understanding.";
+                exampleResponse = "Think of a smart assistant on your phone that can understand your voice commands and answer questions, or a recommendation system on a streaming service that suggests movies you might like. These are common examples of AI in action.";
+            } else if (lowerCaseQuery.includes('hello') || lowerCaseQuery.includes('hi')) {
+                explainerResponse = "Hello there! How can I assist you today with your learning?";
+                exampleResponse = "If you have a topic in mind, just let us know, and we'll do our best to explain it and provide examples!";
+            }
+
+            resolve({ explainerResponse, exampleResponse });
+        }, 1500); // Simulate network delay
+    });
+}
+
+/**
+ * Handles the sending of a message from the user.
+ * Clears input, disables UI, shows loading, calls API, then displays responses.
+ */
+async function sendMessage() {
+    const query = userInput.value.trim();
+    if (query === '') return; // Do nothing if input is empty
+
+    addMessage('You', query, true); // Add user message to chat
+    userInput.value = ''; // Clear the input field
+    userInput.disabled = true; // Disable input to prevent multiple submissions
+    sendButton.disabled = true; // Disable send button
+    loadingIndicator.style.display = 'flex'; // Show the loading indicator
+
+    try {
+        // Call the simulated API (replace with actual backend call in production)
+        const { explainerResponse, exampleResponse } = await simulateGeminiAPIResponse(query);
+
+        // Display agent responses sequentially for a more conversational feel
+        setTimeout(() => {
+            addMessage('Explainer Agent', explainerResponse);
+        }, 500); // Slight delay before Explainer responds
+
+        setTimeout(() => {
+            addMessage('Example Provider Agent', exampleResponse);
+        }, 1500); // Further delay before Example Provider responds
+    } catch (error) {
+        console.error('Error fetching AI response:', error);
+        // Display an error message to the user
+        addMessage('System', 'Oops! Something went wrong while fetching the AI response. Please try again.', false);
+    } finally {
+        // Re-enable input and hide loading indicator after all responses are displayed
+        // A slightly longer delay ensures both agent messages are visible before re-enabling
+        setTimeout(() => {
+            userInput.disabled = false;
+            sendButton.disabled = false;
+            loadingIndicator.style.display = 'none';
+            userInput.focus(); // Return focus to the input field for convenience
+        }, 2000);
+    }
+}
+
+// Event listener for the Send button click
+sendButton.addEventListener('click', sendMessage);
+
+// Event listener for the Enter key press in the input field
+userInput.addEventListener('keypress', (event) => {
+    if (event.key === 'Enter' && !sendButton.disabled) { // Only send if not already disabled
+        sendMessage();
+    }
+});
+
+// Focus on the input field when the page loads for immediate interaction
+window.onload = () => {
+    userInput.focus();
+};
