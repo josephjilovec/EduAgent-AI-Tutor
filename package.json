@@ -1,0 +1,28 @@
+{
+  "name": "eduagent-ai-tutor-backend",
+  "version": "1.0.0",
+  "description": "Backend for the EduAgent AI Tutor, handling AI agent orchestration and Gemini API calls.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "AI",
+    "Education",
+    "Gemini API",
+    "Node.js",
+    "Express.js",
+    "AI Tutor"
+  ],
+  "author": "Your Name/Organization",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
