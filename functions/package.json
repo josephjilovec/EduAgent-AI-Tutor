@@ -1,0 +1,24 @@
+{
+  "name": "eduagent-ai-tutor-functions",
+  "description": "Dependencies for EduAgent AI Tutor Firebase Cloud Functions",
+  "version": "1.0.0",
+  "main": "index.js",
+  "private": true,
+  "engines": {
+    "node": "18"
+  },
+  "dependencies": {
+    "firebase-functions": "^4.9.0",
+    "express": "^4.19.2",
+    "dotenv": "^16.4.5",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  }
+}
